@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register Shop</title>
+<!-- Bootstrap CSS -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<!-- Font Awesome CSS for icons -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<style>
+    body {
+        background-color: #f8f9fa; /* Light gray background */
+        justify-content: center;
+    }
+    .register-container {
+        max-width: 400px; /* Increased max-width */
+        margin: 0 auto;
+        margin-top: 50px; /* Adjust as needed */
+        padding: 20px;
+        background-color: #ffffff; /* White background */
+        border: 1px solid #dee2e6; /* Light border */
+        border-radius: 5px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Box shadow for depth */
+    }
+    .form-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+    .form-group label {
+        position: absolute;
+        top: 50%; /* Start position in the middle */
+        left: 10px;
+        transform: translateY(-50%);
+        font-size: 1rem; /* Larger font size */
+        color: #aaa;
+        transition: all 0.3s ease;
+        pointer-events: none;
+        background-color: #fff; /* Ensure label is readable */
+        padding: 0 5px; /* Add padding to label */
+    }
+    .form-group input:focus ~ label,
+    .form-group input:not(:placeholder-shown) ~ label,
+    .form-group select:focus ~ label,
+    .form-group select:not([value=""]):valid ~ label {
+        top: 0; /* Move label to top */
+        font-size: 0.75rem; /* Smaller font size when floated */
+        color: #ff5722; /* Bright orange color for active/focused state */
+    }
+    .form-control,
+    .custom-select {
+        border: 1px solid #ced4da; /* Light border */
+        border-radius: 4px;
+        padding: 10px; /* Increased padding */
+        width: 100%;
+        height: auto;
+    }
+    .btn-register {
+        background-color: #ff5722; /* Bright orange button */
+        border: none;
+        color: #ffffff;
+        padding: 10px 20px;
+        cursor: pointer;
+        margin-bottom: 10px; /* Added margin */
+    }
+    .btn-register:hover {
+        background-color: #f44336; /* Darker shade of orange on hover */
+    }
+    .form-group.form-check {
+        display: flex;
+        align-items: center;
+        margin-bottom: 30px; /* Adjust as needed */
+    }
+    .form-check-input {
+        margin-right: 0.7rem; /* Space between checkbox and label */
+    }
+    /* Styling for Django messages */
+    .messages-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000; /* Ensure notifications appear above everything else */
+    }
+    .alert {
+        position: relative;
+        width: 400px; /* Maximum width */
+        margin-bottom: 10px;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .select-list:hover{
+        background-color: #ff5722 !important;
+        }
+    .alert .close {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        color: #aaa;
+        cursor: pointer;
+        border: none; /* Remove border */
+        background: none; /* Transparent background */
+    }
+    .alert .close:hover {
+        color: #f44336; /* Darker shade of red on hover */
+    }
+    @keyframes fadeInOut {
+        0% {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .custom-file {
+    width: 100%; /* Full width to match other inputs */
+    height: calc(1.5em + .75rem + 2px); /* Same height as other inputs */
+    margin-top: 1.5rem; /* Same margin-top as other inputs */
+}
+
+/* Adjust the custom file input label to match other placeholders */
+.custom-file-label {
+    position: relative; /* Ensure proper positioning */
+    display: block; /* Block display to match input styling */
+    height: 100%; /* Full height to match input height */
+    padding: .375rem .75rem; /* Same padding as other inputs */
+    font-size: 1rem; /* Same font size as other placeholders */
+    color: #aaa; /* Greyish color for placeholder */
+    background-color: #fff; /* Ensure label is readable */
+    border: 1px solid #ced4da; /* Light border */
+    border-radius: 4px; /* Same border radius as other inputs */
+    pointer-events: none; /* Prevent pointer events */
+}
+
+/* Style the file input to hide it */
+.custom-file-input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0; /* Hide the input */
+    cursor: pointer;
+}
+
+/* Adjust placeholder color when file is selected */
+.custom-file-input:focus ~ .custom-file-label,
+.custom-file-input:not([value=""]) ~ .custom-file-label {
+    color: #ff5722; /* Bright orange color for active/focused state */
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="register-container">
+        <h2 class="text-center mb-4">Register your Shop</h2>
+        <!-- Display Django messages -->
+        <div class="messages-container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% endif %}">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <div>
+                            {% if message.tags == 'success' %}
+                                <i class="fas fa-check-circle mr-2"></i>
+                            {% elif message.tags == 'error' %}
+                                <i class="fas fa-exclamation-circle mr-2"></i>
+                            {% endif %}
+                            {{ message }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <input type="text" name="shop_name" class="form-control" id="name" placeholder=" ">
+                <label for="name"> Shop Name</label>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" id="address" name="address" placeholder=" ">
+                <label for="address">Address</label>
+            </div>
+            <div class="form-group">
+                <select id="shop_category" name="shopcategory" class="custom-select" aria-label="Select category" >
+                    <option value="" disabled selected>Select Category</option>
+                    <option value="electronics" class="select-list">Electronics</option>
+                    <option value="fashion"class="select-list">Fashion</option>
+                    <option value="grocery" class="select-list">Grocery</option>
+                    <option value="home_appliances" class="select-list">Home Appliances</option>
+                    <option value="books" class="select-list">Books</option>
+                    <option value="toys" class="select-list">Toys</option>
+                </select>
+                <label for="shop_category">Select a category</label>
+            </div>
+            <div class="form-group" style="right: 10px;">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="inputGroupFile01" name="shop_logo" style="height: 100%;" >
+                    <label class="custom-file-label" for="inputGroupFile01" style="position: relative; /* Ensure proper positioning */
+                    display: block; /* Block display to match input styling */
+                    height: 100%; /* Full height to match input height */
+                    padding: .375rem .75rem; /* Same padding as other inputs */
+                    font-size: 1rem; /* Same font size as other placeholders */
+                    color: #aaa; /* Greyish color for placeholder */
+                    background-color: #fff; /* Ensure label is readable */
+                    border: 1px solid #ced4da; /* Light border */
+                    border-radius: 4px; /* Same border radius as other inputs */
+                    pointer-events: none; "
+                    >Shop Logo</label>
+                </div>
+                
+            </div>
+            <button type="submit" class="btn btn-register btn-block" id="registerButton">Register</button>
+        </form>
+    </div>
+</div>
+<!-- jQuery, Popper.js, and Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Optional: JavaScript for message animation -->
+<script>
+    // Animation for message items
+    document.addEventListener('DOMContentLoaded', function () {
+        var messageItems = document.querySelectorAll('.alert');
+        messageItems.forEach(function (item, index) {
+            setTimeout(function () {
+                item.style.opacity = '1';
+            }, index * 500); // Delay for each message
+        });
+        // Handle close button functionality
+        var closeButtons = document.querySelectorAll('.close');
+        closeButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                var messageItem = button.closest('.alert');
+                messageItem.style.display = 'none';
+            });
+        });
+    });
+
+    // Display selected file name
+    document.querySelector('.custom-file-input').addEventListener('change', function(e) {
+        var fileName = document.getElementById("inputGroupFile01").files[0].name;
+        var nextSibling = e.target.nextElementSibling;
+        nextSibling.innerText = fileName;
+    });
+</script>
+</body>
+</html>

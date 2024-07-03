@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.1.2/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Custom CSS styles */
+        .nav-item a:hover {
+            background-color: #FC8019; /* Light Orange */
+            color: #ffffff;
+            border-radius: 5px;
+        }
+        
+        .nav-item {
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+
+        .logout {
+            color: red; /* Color for logout link */
+        }
+
+        .navbar-brand {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .unimart {
+            margin-left: 20px;
+        }
+
+        body {
+            background-color: #f5f5f5;
+        }
+
+        .navbar {
+            background-color: #ffffff !important;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .profile-section {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .profile-photo {
+            width: 150px;
+            transition: transform 0.3s ease-in-out;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .profile-photo:hover {
+            cursor: pointer;
+        }
+
+        .profile-photo-enlarged {
+            width: 500px; /* Specific width for enlarged photo */
+            height: auto;
+            max-width: 90%;
+            max-height: 90%;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1050;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1040;
+        }
+
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .btn-update {
+            background-color: #f47519;
+            width: 100%;
+        }
+
+        .btn-update:hover {
+            background-color: #e46400;
+        }
+
+        .change-photo-btn {
+            background-color: #f47519;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .change-photo-btn:hover {
+            background-color: #e46400;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+        .custom-file {
+    width: 100%; /* Full width to match other inputs */
+    height: calc(1.5em + .75rem + 2px); /* Same height as other inputs */
+    margin-top: 1.5rem; /* Same margin-top as other inputs */
+}
+
+/* Adjust the custom file input label to match other placeholders */
+.custom-file-label {
+    position: relative; /* Ensure proper positioning */
+    display: block; /* Block display to match input styling */
+    height: 100%; /* Full height to match input height */
+    padding: .375rem .75rem; /* Same padding as other inputs */
+    font-size: 1rem; /* Same font size as other placeholders */
+    color: #aaa; /* Greyish color for placeholder */
+    background-color: #fff; /* Ensure label is readable */
+    border: 1px solid #ced4da; /* Light border */
+    border-radius: 4px; /* Same border radius as other inputs */
+    pointer-events: none; /* Prevent pointer events */
+}
+
+/* Style the file input to hide it */
+.custom-file-input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0; /* Hide the input */
+    cursor: pointer;
+}
+
+/* Adjust placeholder color when file is selected */
+.custom-file-input:focus ~ .custom-file-label,
+.custom-file-input:not([value=""]) ~ .custom-file-label {
+    color: #ff5722; /* Bright orange color for active/focused state */
+}
+.messages-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000; /* Ensure notifications appear above everything else */
+    }
+
+    .message-item {
+        position: relative;/* Full width */
+        width: 400px; /* Maximum width */
+        margin-bottom: 10px;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        opacity: 1; /* Ensure it is visible */
+    }
+
+    .message-item.success {
+        background-color: #d4edda; /* Bootstrap success background color */
+        border-color: #c3e6cb; /* Bootstrap success border color */
+        color: #155724; /* Bootstrap success text color */
+    }
+
+    .message-item.error {
+        background-color: #f8d7da; /* Bootstrap danger background color */
+        border-color: #f5c6cb; /* Bootstrap danger border color */
+        color: #721c24; /* Bootstrap danger text color */
+    }
+
+    .message-item .close-btn {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        color: #aaa;
+        cursor: pointer;
+        border: none; /* Remove border */
+        background: none; /* Transparent background */
+    }
+
+    .message-item .close-btn:hover {
+        color: #f44336; /* Darker shade of red on hover */
+    }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="#">
+            <img src="https://unimart12.s3.eu-north-1.amazonaws.com/Unimart+(2).png" width="30" height="30" alt="Logo">
+            <h3 class="unimart">UniMart</h3>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../../products/">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Orders</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">View as User</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link logout" href="../../user/login/">Log Out</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="messages-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert message-item {% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% endif %}">
+                    <button type="button" class="close close-btn" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <div>
+                        {% if message.tags == 'success' %}
+                            <i class="fas fa-check-circle mr-2"></i>
+                        {% elif message.tags == 'error' %}
+                            <i class="fas fa-exclamation-circle mr-2"></i>
+                        {% endif %}
+                        {{ message }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="container mt-5">
+        <h1 class="mb-4" style="font-family: Arial, sans-serif; font-size: 2.5rem;">Welcome, {{user.name}}!</h1>
+        
+        <div class="profile-section">
+            <h2 style="font-family: Arial, sans-serif; font-size: 1.8rem;">Personal Information</h2>
+            <div class="text-center my-4">
+                <img src="{{ user.photo_url }}" class="rounded-circle shadow-4 profile-photo" alt="Avatar" style="border: 1px solid #555555;" />
+            </div>
+            <form method="POST" action="{% url 'update_personal_info' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ user.name }}">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" id="email" value="{{ user.email }}" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="mobile">Mobile</label>
+                    <input type="text" class="form-control" id="mobile" name="mobile" value="{{ user.mobile_no }}">
+                </div>
+                <button type="submit" class="btn btn-update mt-3" style="color: #ffffff;">Update Personal Info</button>
+            </form>
+
+            <form method="POST" action="{% url 'update_user_photo' %}" enctype="multipart/form-data" class="mt-4">
+                {% csrf_token %}
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="inputGroupFile01" name="profile_photo" style="height: 100%;" >
+                    <label class="custom-file-label" for="inputGroupFile01" style="position: relative; /* Ensure proper positioning */
+                    display: block; /* Block display to match input styling */
+                    height: 100%; /* Full height to match input height */
+                    padding: .375rem .75rem; /* Same padding as other inputs */
+                    font-size: 1rem; /* Same font size as other placeholders */
+                    color: #aaa; /* Greyish color for placeholder */
+                    background-color: #fff; /* Ensure label is readable */
+                    border: 1px solid #ced4da; /* Light border */
+                    border-radius: 4px; /* Same border radius as other inputs */
+                    pointer-events: none; "
+                    >Profile Photo</label>
+                </div>
+                <button type="submit" class="btn btn-update mt-3" style="color: #ffffff;">Update Profile Photo</button>
+            </form>
+        </div>
+
+        <div class="profile-section">
+            <h2 style="font-family: Arial, sans-serif; font-size: 1.8rem;">Shop Information</h2>
+            <div class="text-center my-4">
+                <img src="{{ user.shops.first.logo_url }}" class="rounded-circle shadow-4 profile-photo" alt="Shop Logo"  style="border: 1px solid #555555;"/>
+            </div>
+            <form method="POST" action="{% url 'update_shop_info' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="shop-name">Shop Name</label>
+                    <input type="text" class="form-control" id="shop-name" name="shop-name" value="{{ user.shops.first.name }}">
+                </div>
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" class="form-control" id="address" name="address" value="{{ user.shops.first.address }}">
+                </div>
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category" class="form-control" name="category">
+                        <option value="" disabled>Select Category</option>
+                        <option value="electronics" {% if user.shops.first.category == 'electronics' %}selected{% endif %}>Electronics</option>
+                        <option value="fashion" {% if user.shops.first.category == 'fashion' %}selected{% endif %}>Fashion</option>
+                        <option value="grocery" {% if user.shops.first.category == 'grocery' %}selected{% endif %}>Grocery</option>
+                        <!-- Add other categories as needed -->
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-update mt-3" style="color: #ffffff;">Update Shop Info</button>
+            </form>
+
+            <form method="POST" action="{% url 'update_shop_logo' %}" enctype="multipart/form-data" class="mt-4">
+                {% csrf_token %}
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="inputGroupFile01" name="shop_logo" style="height: 100%;" >
+                    <label class="custom-file-label" for="inputGroupFile01" style="position: relative; /* Ensure proper positioning */
+                    display: block; /* Block display to match input styling */
+                    height: 100%; /* Full height to match input height */
+                    padding: .375rem .75rem; /* Same padding as other inputs */
+                    font-size: 1rem; /* Same font size as other placeholders */
+                    color: #aaa; /* Greyish color for placeholder */
+                    background-color: #fff; /* Ensure label is readable */
+                    border: 1px solid #ced4da; /* Light border */
+                    border-radius: 4px; /* Same border radius as other inputs */
+                    pointer-events: none; "
+                    >Shop Logo</label>
+                </div>
+                <button type="submit" class="btn btn-update mt-3" style="color: #ffffff;">Update Shop Logo</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Photo Modal -->
+    <div id="photo-modal" class="d-none">
+        <div class="backdrop"></div>
+        <div class="profile-photo-enlarged text-center">
+            <img src="" class="rounded-circle shadow-9" alt="Avatar" />
+        </div>
+        <!-- Bootstrap JS, Popper.js, and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    document.querySelectorAll('.profile-photo').forEach(photo => {
+        photo.addEventListener('click', function() {
+            const photoModal = document.getElementById('photo-modal');
+            const enlargedPhoto = photoModal.querySelector('img');
+            enlargedPhoto.src = this.src;
+            photoModal.classList.remove('d-none');
+        });
+    });
+
+    document.querySelector('.backdrop').addEventListener('click', function() {
+        document.getElementById('photo-modal').classList.add('d-none');
+    });
+     // Display selected file name
+     document.querySelector('.custom-file-input').addEventListener('change', function(e) {
+        var fileName = document.getElementById("inputGroupFile01").files[0].name;
+        var nextSibling = e.target.nextElementSibling;
+        nextSibling.innerText = fileName;
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        var messageItems = document.querySelectorAll('.alert');
+        messageItems.forEach(function (item, index) {
+            setTimeout(function () {
+                item.style.opacity = '1';
+            }, index * 500); // Delay for each message
+        });
+
+        // Handle close button functionality
+        var closeButtons = document.querySelectorAll('.close');
+        closeButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                var messageItem = button.closest('.alert');
+                messageItem.style.display = 'none';
+            });
+        });
+    });
+</script>
+

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="CodeHim">
+  <title>OTP Verification</title>
+  <!-- Style CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <style>
+    .otp-field {
+      display: flex;
+      justify-content: center;
+      column-gap: 10px;
+      margin-bottom: 20px;
+    }
+    .otp-field input {
+      height: 45px;
+      width: 42px;
+      border-radius: 6px;
+      outline: none;
+      font-size: 1.125rem;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
+    .otp-field input:focus {
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+    }
+    .otp-field input::-webkit-inner-spin-button,
+    .otp-field input::-webkit-outer-spin-button {
+      display: none;
+    }
+    .resend {
+      font-size: 12px;
+    }
+    .messages-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 10000; /* Ensure notifications appear above everything else */
+    }
+    .message-item {
+      position: relative; /* Full width */
+      width: 400px; /* Maximum width */
+      margin-bottom: 10px;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+      opacity: 0;
+      animation: fadeInOut 0.5s forwards; /* Animation for fadeIn and fadeOut */
+    }
+    .message-item.success {
+      background-color: #d4edda; /* Bootstrap success background color */
+      border-color: #c3e6cb; /* Bootstrap success border color */
+      color: #155724; /* Bootstrap success text color */
+    }
+    .message-item.error {
+      background-color: #f8d7da; /* Bootstrap danger background color */
+      border-color: #f5c6cb; /* Bootstrap danger border color */
+      color: #721c24; /* Bootstrap danger text color */
+    }
+    .message-item .close-btn {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      color: #aaa;
+      cursor: pointer;
+      border: none; /* Remove border */
+      background: none; /* Transparent background */
+    }
+    .message-item .close-btn:hover {
+      color: #f44336; /* Darker shade of red on hover */
+    }
+    .code {
+    background-color: #ff5722; /* Bright orange button */
+    border: none;
+    border-radius: 10px;
+    color: #ffffff;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-bottom: 10px; /* Added margin */
+    transition: opacity 0.3s ease; /* Smooth transition for opacity */
+}
+
+.code:hover {
+    background-color: #f44336;
+    color:black; /* Darker shade of orange on hover */
+}
+
+.code:disabled {
+    opacity: 0.5; /* Faded appearance when disabled */
+    cursor: not-allowed; /* Show not-allowed cursor */
+}
+
+    @keyframes fadeInOut {
+      0% {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css'>
+</head>
+<body>
+  <div class="messages-container">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="message-item {% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% endif %}">
+          <button type="button" class="close close-btn" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <div>
+            {% if message.tags == 'success' %}
+              <i class="fas fa-check-circle mr-2"></i>
+            {% elif message.tags == 'error' %}
+              <i class="fas fa-exclamation-circle mr-2"></i>
+            {% endif %}
+            {{ message }}
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-6 col-lg-4" style="min-width: 500px;">
+      <div class="card bg-white mb-5 mt-5 border-0" style="box-shadow: 0 12px 15px rgba(0, 0, 0, 0.02);">
+        <div class="card-body p-5 text-center">
+          <h4>Verify</h4>
+          <p>Your code was sent to you via email</p>
+          <form method="post" action="{% url 'verify_otp' %}">
+            {% csrf_token %}
+            <div class="otp-field mb-4">
+              {% for i in otp_range %}
+                <input type="number" name="otp_digit_{{ i }}" {% if i != 0 %}disabled{% endif %} />
+              {% endfor %}
+            </div>
+            <button class="code" type="submit" disabled>
+              Verify
+            </button>
+          </form>
+          <p class="text-center mt-2 mb-0">
+            Didn't receive code? <a href="../resend_otp/" style="color: #ff5722;">Request again</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script JS -->
+  <script>
+    const inputs = document.querySelectorAll(".otp-field > input");
+    const button = document.querySelector(".code");
+
+    document.addEventListener("click", function (e) {
+      if (e.target && e.target.classList.contains("close-btn")) {
+        const messageItem = e.target.closest(".message-item");
+        if (messageItem) {
+          messageItem.style.animation = "fadeOut 0.5s forwards";
+          setTimeout(() => {
+            messageItem.remove();
+          }, 500);
+        }
+      }
+    });
+
+    window.addEventListener("load", () => inputs[0].focus());
+    button.setAttribute("disabled", "disabled");
+
+    inputs[0].addEventListener("paste", function (event) {
+      event.preventDefault();
+      const pastedValue = (event.clipboardData || window.clipboardData).getData("text");
+      const otpLength = inputs.length;
+      for (let i = 0; i < otpLength; i++) {
+        if (i < pastedValue.length) {
+          inputs[i].value = pastedValue[i];
+          inputs[i].removeAttribute("disabled");
+          inputs[i].focus();
+        } else {
+          inputs[i].value = ""; // Clear any remaining inputs
+          inputs[i].focus();
+        }
+      }
+    });
+
+    inputs.forEach((input, index1) => {
+      input.addEventListener("keyup", (e) => {
+        const currentInput = input;
+        const nextInput = input.nextElementSibling;
+        const prevInput = input.previousElementSibling;
+
+        if (currentInput.value.length > 1) {
+          currentInput.value = "";
+          return;
+        }
+
+        if (nextInput && nextInput.hasAttribute("disabled") && currentInput.value !== "") {
+          nextInput.removeAttribute("disabled");
+          nextInput.focus();
+        }
+
+        if (e.key === "Backspace") {
+          inputs.forEach((input, index2) => {
+            if (index1 <= index2 && prevInput) {
+              input.setAttribute("disabled", true);
+              input.value = "";
+              prevInput.focus();
+            }
+          });
+        }
+
+        button.classList.remove("active");
+        button.setAttribute("disabled", "disabled");
+
+        const inputsNo = inputs.length;
+        if (!inputs[inputsNo - 1].disabled && inputs[inputsNo - 1].value !== "") {
+          button.classList.add("active");
+          button.removeAttribute("disabled");
+          return;
+        }
+      });
+    });
+  </script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+  
+</body>
+</html>

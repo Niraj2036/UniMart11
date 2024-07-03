@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register Page</title>
+<!-- Bootstrap CSS -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<!-- Font Awesome CSS for icons -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<style>
+    body {
+        background-color: #f8f9fa; /* Light gray background */
+        justify-content: center;
+    }
+    .register-container {
+        max-width: 400px; /* Increased max-width */
+        margin: 0 auto;
+        margin-top: 50px; /* Adjust as needed */
+        padding: 20px;
+        background-color: #ffffff; /* White background */
+        border: 1px solid #dee2e6; /* Light border */
+        border-radius: 5px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Box shadow for depth */
+    }
+    .form-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+    .form-group label {
+        position: absolute;
+        top: 50%; /* Start position in the middle */
+        left: 10px;
+        transform: translateY(-50%);
+        font-size: 1rem; /* Larger font size */
+        color: #aaa;
+        transition: all 0.3s ease;
+        pointer-events: none;
+        background-color: #fff; /* Ensure label is readable */
+        padding: 0 5px; /* Add padding to label */
+    }
+    .form-group input:focus ~ label,
+    .form-group input:not(:placeholder-shown) ~ label {
+        top: 0; /* Move label to top */
+        font-size: 0.75rem; /* Smaller font size when floated */
+        color: #ff5722; /* Bright orange color for active/focused state */
+    }
+    .form-control {
+        border: 1px solid #ced4da; /* Light border */
+        border-radius: 4px;
+        padding: 10px; /* Increased padding */
+    }
+    .btn-register {
+        background-color: #ff5722; /* Bright orange button */
+        border: none;
+        color: #ffffff;
+        padding: 10px 20px;
+        cursor: pointer;
+        margin-bottom: 10px; /* Added margin */
+    }
+    .btn-register:hover {
+        background-color: #f44336; /* Darker shade of orange on hover */
+    }
+    .form-group.form-check {
+        display: flex;
+        align-items: center;
+        margin-bottom: 30px; /* Adjust as needed */
+    }
+    
+    .form-check-input {
+        margin-right: 0.7rem; /* Space between checkbox and label */
+    }
+
+    /* Styling for Django messages */
+    .messages-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000; /* Ensure notifications appear above everything else */
+    }
+
+    .alert {
+        position: relative;
+        width: 400px; /* Maximum width */
+        margin-bottom: 10px;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .alert .close {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        color: #aaa;
+        cursor: pointer;
+        border: none; /* Remove border */
+        background: none; /* Transparent background */
+    }
+
+    .alert .close:hover {
+        color: #f44336; /* Darker shade of red on hover */
+    }
+
+    @keyframes fadeInOut {
+        0% {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="register-container">
+        <h2 class="text-center mb-4">Register</h2>
+        
+        <!-- Display Django messages -->
+        <div class="messages-container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% endif %}">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <div>
+                            {% if message.tags == 'success' %}
+                                <i class="fas fa-check-circle mr-2"></i>
+                            {% elif message.tags == 'error' %}
+                                <i class="fas fa-exclamation-circle mr-2"></i>
+                            {% endif %}
+                            {{ message }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <input type="text" name="user_name" class="form-control" id="name" placeholder=" " value="{{ request_data.user_name }}">
+                <label for="name">Name</label>
+            </div>
+            <div class="form-group">
+                <input type="tel" class="form-control" id="phone" name="mobile_no" placeholder=" " value="{{ request_data.mobile_no }}">
+                <label for="phone">Phone No.</label>
+            </div>
+            <div class="form-group">
+                <input type="email" class="form-control" id="email" name="email" placeholder=" " value="{{ request_data.email }}">
+                <label for="email">Email</label>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" id="address" name="address" placeholder=" " value="{{ request_data.address }}">
+                <label for="address">Address</label>
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control" id="password" name="pass" placeholder=" ">
+                <label for="password">Password</label>
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control" id="confirm-password" name="cnfpass" placeholder=" ">
+                <label for="confirm-password">Confirm Password</label>
+            </div>
+            
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="register-seller" name="registerAsSeller" {% if request_data.registerAsSeller %}checked{% endif %}>
+                <label class="form-check-label" for="register-seller">Register as Seller</label>
+            </div>
+            <button type="submit" class="btn btn-register btn-block" id="registerButton">Register</button>
+            <p class="text-center mt-2 mb-0">
+                Already have an account? <a href="../login/" style="color: #ff5722;">Login here</a>
+            </p>
+        </form>
+    </div>
+</div>
+<!-- jQuery, Popper.js, and Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Optional: JavaScript for message animation -->
+<script>
+    // Animation for message items
+    document.addEventListener('DOMContentLoaded', function () {
+        var messageItems = document.querySelectorAll('.alert');
+        messageItems.forEach(function (item, index) {
+            setTimeout(function () {
+                item.style.opacity = '1';
+            }, index * 500); // Delay for each message
+        });
+
+        // Handle close button functionality
+        var closeButtons = document.querySelectorAll('.close');
+        closeButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                var messageItem = button.closest('.alert');
+                messageItem.style.display = 'none';
+            });
+        });
+    });
+</script>
+</body>
+</html>
